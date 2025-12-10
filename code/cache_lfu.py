@@ -12,7 +12,7 @@ class LFUCache(CachePolicy):
     def __init__(self, capacity: int):
         super().__init__(capacity)
         self.cache = {}  # item -> frequency
-        self.freq_to_items = defaultdict(OrderedDict)  # freq -> OrderedDict of items
+        self.freq_to_items = defaultdict(OrderedDict)  # frequency -> OrderedDict of items
         self.min_freq = 0
     
     def access(self, item: int) -> bool:
