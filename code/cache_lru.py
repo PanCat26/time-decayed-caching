@@ -16,14 +16,12 @@ class LRUCache(CachePolicy):
     def access(self, item: int) -> bool:
         self.time += 1
         if item in self.cache:
-            # Move to end (most recently used)
             self.cache.move_to_end(item)
             self.hits += 1
             return True
         else:
             self.misses += 1
             if len(self.cache) >= self.capacity:
-                # Remove least recently used (first item)
                 self.cache.popitem(last=False)
             self.cache[item] = True
             return False

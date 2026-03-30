@@ -27,12 +27,10 @@ class TraceGenerator:
         if seed is not None:
             np.random.seed(seed)
         
-        # Generate Zipf probabilities
         ranks = np.arange(1, num_items + 1)
         probabilities = 1.0 / (ranks ** alpha)
         probabilities /= probabilities.sum()
         
-        # Generate trace
         trace = np.random.choice(num_items, size=num_requests, p=probabilities)
         return trace
     
@@ -61,23 +59,19 @@ class TraceGenerator:
             np.random.seed(seed)
         
         trace = []
-        hot_set_size = num_items // 4  # 25% of items are hot in each phase
-        
+        hot_set_size = num_items // 4
+
         for phase in range(num_phases):
-            # Determine hot set for this phase (different for each phase)
             hot_start = (phase * hot_set_size) % (num_items - hot_set_size)
             hot_items = np.arange(hot_start, hot_start + hot_set_size)
             cold_items = np.array([i for i in range(num_items) if i not in hot_items])
             
-            # Generate Zipf probabilities for hot items
             ranks = np.arange(1, len(hot_items) + 1)
             hot_probs = 1.0 / (ranks ** alpha)
             hot_probs /= hot_probs.sum()
             
-            # Uniform distribution for cold items
             cold_probs = np.ones(len(cold_items)) / len(cold_items)
             
-            # Generate requests for this phase
             for _ in range(phase_length):
                 if np.random.random() < p_hot:
                     item = np.random.choice(hot_items, p=hot_probs)

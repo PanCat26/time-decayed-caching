@@ -14,26 +14,22 @@ def create_delta_table_image(results_df: pd.DataFrame, output_path: str):
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.axis('off')
     
-    # Create table
     table = ax.table(
         cellText=results_df.values,
         colLabels=results_df.columns,
         cellLoc='center',
         loc='center',
-        colWidths=[0.45, 0.18, 0.18, 0.18]  # First column wider
+        colWidths=[0.45, 0.18, 0.18, 0.18]
     )
     
-    # Style the table
     table.auto_set_font_size(False)
     table.set_fontsize(11)
     table.scale(1.4, 2.0)
     
-    # Color header cells
     for i in range(len(results_df.columns)):
         table[(0, i)].set_facecolor('#4472C4')
         table[(0, i)].set_text_props(color='white', fontweight='bold')
     
-    # Alternate row colors and color-code delta values
     for i in range(len(results_df)):
         for j in range(len(results_df.columns)):
             if i % 2 == 0:
@@ -41,7 +37,6 @@ def create_delta_table_image(results_df: pd.DataFrame, output_path: str):
             else:
                 table[(i + 1, j)].set_facecolor('#FFFFFF')
             
-            # First column (trace name) in bold
             if j == 0:
                 table[(i + 1, j)].set_text_props(fontweight='bold')
     
@@ -77,7 +72,6 @@ def create_sliding_window_graph(results: Dict[str, Dict[str, List[float]]],
         trace_results = results[trace_name]
         
         for algo_name, hit_ratios in trace_results.items():
-            # Subsample for plotting (every 100th point)
             step = max(1, len(hit_ratios) // 500)
             x = list(range(0, len(hit_ratios), step))
             y = [hit_ratios[i] for i in x]

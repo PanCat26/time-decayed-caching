@@ -23,8 +23,6 @@ def parse_nasa_log(filepath: str, max_requests: int = None) -> tuple:
     """
     print(f"  Loading: {filepath}")
     
-    # Regex to extract the URL from each log line
-    # Format: host - - [timestamp] "METHOD /url HTTP/x.x" status size
     url_pattern = re.compile(r'"[A-Z]+\s+([^\s]+)\s+HTTP')
     
     urls = []
@@ -38,7 +36,6 @@ def parse_nasa_log(filepath: str, max_requests: int = None) -> tuple:
     
     print(f"  Parsed {len(urls)} requests")
     
-    # Convert URLs to integer IDs
     unique_urls = list(set(urls))
     url_to_id = {url: idx for idx, url in enumerate(unique_urls)}
     trace = np.array([url_to_id[url] for url in urls])
@@ -55,24 +52,20 @@ def run_realworld_experiments():
     print("Time-Decayed Caching - Real-World Trace Experiments")
     print("=" * 60)
     
-    # Load NASA trace
     print("\n[1/4] Loading NASA HTTP access log...")
     
     data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'access_log_Jul95')
     
-    # Use first 100,000 requests for reasonable runtime
     trace, num_unique = parse_nasa_log(data_path, max_requests=100000)
     
     traces = {'NASA HTTP Log': trace}
     
-    # Parameters
     CACHE_SIZES_PERCENT = list(range(1, 17))  # 1% to 16%
     
-    # Run Experiment 1: Hit ratios for all combinations
     print("\n[2/4] Running Experiment 1: Computing hit ratios...")
     
     runner = ExperimentRunner()
-    all_results = {}  # trace -> cache_size -> algorithm -> hit_ratio
+    all_results = {}
     
     for trace_name, tr in traces.items():
         print(f"  Processing: {trace_name}")
@@ -86,16 +79,13 @@ def run_realworld_experiments():
                 stats = runner.run_single_experiment(tr, cache_size, algo_name)
                 all_results[trace_name][cache_pct][algo_name] = stats['hit_ratio']
             
-            # Print progress
             print(f"    Cache {cache_pct}%: Proposed={all_results[trace_name][cache_pct]['Proposed']:.3f}, "
                   f"LRU={all_results[trace_name][cache_pct]['LRU']:.3f}, "
                   f"LFU={all_results[trace_name][cache_pct]['LFU']:.3f}, "
                   f"ARC={all_results[trace_name][cache_pct]['ARC']:.3f}")
     
-    # Calculate Delta values and create summary table
     print("\n[3/4] Computing Delta values and generating table...")
     
-    # Create summary table with average deltas per trace
     summary_data = []
     for trace_name in traces:
         row = [trace_name]
@@ -114,14 +104,13 @@ def run_realworld_experiments():
         columns=['Trace', 'Δ vs LRU', 'Δ vs LFU', 'Δ vs ARC']
     )
     
-    # Save table as image
     create_delta_table_image(summary_df, 'delta_table_realworld.png')
     
     # Run Experiment 2: Sliding window analysis
     print("\n[4/4] Running Experiment 2: Sliding window analysis...")
     
     sliding_results = {}
-    cache_pct = 5  # Use 5% cache size for sliding window experiment
+    cache_pct = 5
     cache_size = max(1, int(num_unique * cache_pct / 100))
     
     for trace_name, tr in traces.items():
@@ -130,14 +119,12 @@ def run_realworld_experiments():
             tr, cache_size, window_size=1000
         )
     
-    # Create sliding window graph
     create_sliding_window_graph(
         sliding_results, 
         list(traces.keys()),
         'sliding_window_realworld.png'
     )
     
-    # Print summary
     print("\n" + "=" * 60)
     print("EXPERIMENT COMPLETE")
     print("=" * 60)
@@ -146,7 +133,6 @@ def run_realworld_experiments():
     print("  2. sliding_window_realworld.png - Adaptability graph")
     print("\nSummary of results:")
     
-    # Print average Delta values
     print("\nAverage Δ(j, c, Proposed) across all cache sizes:")
     for trace_name in traces:
         print(f"\n  {trace_name}:")
@@ -159,7 +145,6 @@ def run_realworld_experiments():
             avg_delta = np.mean(deltas)
             print(f"    vs {algo}: {avg_delta:+.2f}%")
     
-    # Open the images
     print("\nOpening result images...")
     import subprocess
     subprocess.Popen(['start', '', 'delta_table_realworld.png'], shell=True)

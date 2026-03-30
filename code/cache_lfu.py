@@ -11,14 +11,13 @@ class LFUCache(CachePolicy):
     
     def __init__(self, capacity: int):
         super().__init__(capacity)
-        self.cache = {}  # item -> frequency
-        self.freq_to_items = defaultdict(OrderedDict)  # frequency -> OrderedDict of items
+        self.cache = {}
+        self.freq_to_items = defaultdict(OrderedDict)
         self.min_freq = 0
     
     def access(self, item: int) -> bool:
         self.time += 1
         if item in self.cache:
-            # Update frequency
             freq = self.cache[item]
             del self.freq_to_items[freq][item]
             if not self.freq_to_items[freq]:
@@ -33,7 +32,6 @@ class LFUCache(CachePolicy):
         else:
             self.misses += 1
             if len(self.cache) >= self.capacity:
-                # Remove least frequently used
                 lfu_items = self.freq_to_items[self.min_freq]
                 evict_item = next(iter(lfu_items))
                 del lfu_items[evict_item]
