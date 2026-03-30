@@ -1,6 +1,6 @@
 # Time-Decayed Caching (TDC)
 
-A novel cache replacement policy that unifies recency and frequency signals through exponential time decay. This repository contains the implementation, baselines, synthetic/real-world trace generators, and the full experimental evaluation framework.
+A novel cache replacement policy that unifies recency and frequency signals through exponential time decay. This repository contains the implementation, the full experimental evaluation framework, and the resulting academic paper.
 
 ## Overview
 
@@ -11,8 +11,6 @@ Traditional cache replacement policies treat recency and frequency as separate s
 $$\text{Score}(x, t) = \sum_{i \in \text{accesses}(x)} e^{-\lambda\,(t - t_i)}$$
 
 where $\lambda > 0$ is a decay rate parameter and $t_i$ is the timestamp of each past access to item $x$. When the cache is full, the item with the lowest score is evicted.
-
-This formulation smoothly interpolates between LRU-like behavior ($\lambda \to \infty$, only the most recent access matters) and LFU-like behavior ($\lambda \to 0$, all accesses are weighted equally). A single, interpretable parameter controls the recency-frequency tradeoff.
 
 ## Repository Structure
 
